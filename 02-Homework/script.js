@@ -1,4 +1,5 @@
-// grab lon and lat values from first api to use for one call api
+// maybe local storage to keep history list
+// declaring variables to access the HTML
 const $city = $('.city');
 const $temp = $('.temp');
 const $humidity = $('.humidity');
@@ -8,32 +9,44 @@ const $icon = $('.icon');
 const currentTime = moment().format('l');
 const $fiveday = $('.bottom');
 const $list = $('.list-group')
-
+// initiallizing variables globally that I will need in other functions
 var lat;
 var lon;
 const APIKey = "166a433c57516f51dfab1f7edaed8413";
+// funtion used to display current weather conditions onto page
 function displayCurrent() {
+    // take user city
     var userCity = $('.input').val();
+    // query API based on user city
     var queryURL1 = "https://api.openweathermap.org/data/2.5/weather?units=imperial&q=" + userCity + "&appid=" + APIKey;
+    // make API request for icon, city name, temp, humidity, and wind
     $.ajax({
         url: queryURL1,
         method: "GET"
     }).then(function(response) {
         console.log(response)
         $('.current').addClass('main');
+        // add icon
         $icon.attr('src', 'http://openweathermap.org/img/wn/'+ response.weather[0].icon + '@2x.png')
+        // add user city and the current date from moments library
         $city.text(response.name + ' ' + "(" + currentTime + ")");
+        // add temperature
         $temp.text("Temperature: " + response.main.temp+ ' °F');
+        // add humidiy
         $humidity.text("Humidity: " + response.main.humidity + '%');
-        $wind.text("Wind speed: " + response.wind.speed + " MPH");   
+        // add wind speed
+        $wind.text("Wind speed: " + response.wind.speed + " MPH"); 
+        // set lat and lon values taken from this api call to use in another api call  
         lat = response.coord.lat;
         lon = response.coord.lon;
         var queryURL2 = 'http://api.openweathermap.org/data/2.5/uvi?appid='+ APIKey +'&lat='+ lat +'&lon='+ lon;
+    // make api request for uv value
     $.ajax({
         url: queryURL2,
         method: "GET"
     }).then(function(response) {
-        console.log(response)   
+        console.log(response)
+        // add uv value and give it a color based on severity of value   
         $UV.text("UV index: " + response.value);
         if (response.value < 6) {
             $UV.css({
@@ -50,22 +63,28 @@ function displayCurrent() {
                 'color': 'red',
             });
         }
+        // invoking next function inside this one to ensure first function finishes
+        // running before this one begins
         display5day();
+        // clear input text box
         $('.input').val('');
     });
 });        
 }
+// function used to display 5 day forecast onto page
 function display5day() {
+    // clear container
     $fiveday.text('')
-    
     var queryURL3 = "https://api.openweathermap.org/data/2.5/onecall?units=imperial&lat=" + lat + "&lon=" + lon + "&appid=" + APIKey;
-
+    // make api request for 5 day forecast
     $.ajax({
         url: queryURL3,
         method: "GET"
     }).then(function(response) {
     console.log(response)
+    // for loop dynamically adding forecasts one day at a time
     for (let i = 1; i<6; i++) {
+        // create a div
         var $newdiv = $('<div>')
         // add date
         var $newp1 = $('<p>')
@@ -87,13 +106,15 @@ function display5day() {
             'background-color': 'lightblue',
             'margin': '10px'
         })
+        // add div to fiveday container
         $fiveday.append($newdiv)
     }
-
 });
 }
 $(document).on("click", ".btn", function(event) {
+    // dispay weather conditions when search button is clicked
     displayCurrent();
+    // add user city to a list group that contains users search history
     var userCity = $('.input').val();
     var historybtn = $('<button>')
         historybtn.addClass(`list-group-item list-group-item-action`)
@@ -102,8 +123,10 @@ $(document).on("click", ".btn", function(event) {
         $list.prepend(historybtn)
 });
 $(document).on('click', '.list-group',function(event) {
+    // when an item from search history is clicked, grab text value
     const value = $(event.target).closest('.list-group-item').text();
+    // set input text box to targeted city name
     $('.input').val(value);
+    // display weather conditions
     displayCurrent();
-    
 });
