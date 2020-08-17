@@ -1,0 +1,10 @@
+h1 {
+    text-align: center;
+}
+.main {
+    border: 1px solid gray;
+    padding: 10px;
+}
+.left {
+    background-color: lightgray;
+}
