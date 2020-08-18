@@ -24,10 +24,9 @@ function displayCurrent() {
         url: queryURL1,
         method: "GET"
     }).then(function(response) {
-        console.log(response)
         $('.current').addClass('main');
         // add icon
-        $icon.attr('src', 'http://openweathermap.org/img/wn/'+ response.weather[0].icon + '@2x.png')
+        $icon.attr('src', 'https://openweathermap.org/img/wn/'+ response.weather[0].icon + '@2x.png')
         // add user city and the current date from moments library
         $city.text(response.name + ' ' + "(" + currentTime + ")");
         // add temperature
@@ -45,7 +44,6 @@ function displayCurrent() {
         url: queryURL2,
         method: "GET"
     }).then(function(response) {
-        console.log(response)
         // add uv value and give it a color based on severity of value   
         $UV.text("UV index: " + response.value);
         if (response.value < 6) {
@@ -81,7 +79,6 @@ function display5day() {
         url: queryURL3,
         method: "GET"
     }).then(function(response) {
-    console.log(response)
     // for loop dynamically adding forecasts one day at a time
     for (let i = 1; i<6; i++) {
         // create a div
@@ -92,7 +89,7 @@ function display5day() {
         $newdiv.append($newp1)
         // add icon
         var $newimg = $('<img>')
-        $newimg.attr("src", 'http://openweathermap.org/img/wn/'+ response.daily[i].weather[0].icon + '@2x.png')
+        $newimg.attr("src", 'https://openweathermap.org/img/wn/'+ response.daily[i].weather[0].icon + '@2x.png')
         $newdiv.append($newimg)
         // add temp
         var $newp3 = $('<p>')
