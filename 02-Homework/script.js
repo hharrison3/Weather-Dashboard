@@ -39,7 +39,7 @@ function displayCurrent() {
         // set lat and lon values taken from this api call to use in another api call  
         lat = response.coord.lat;
         lon = response.coord.lon;
-        var queryURL2 = 'http://api.openweathermap.org/data/2.5/uvi?appid='+ APIKey +'&lat='+ lat +'&lon='+ lon;
+        var queryURL2 = 'https://api.openweathermap.org/data/2.5/uvi?appid='+ APIKey +'&lat='+ lat +'&lon='+ lon;
     // make api request for uv value
     $.ajax({
         url: queryURL2,
