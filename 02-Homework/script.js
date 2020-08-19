@@ -13,11 +13,13 @@ const $list = $('.list-group')
 var lat;
 var lon;
 const APIKey = "166a433c57516f51dfab1f7edaed8413";
-// funtion used to display current weather conditions onto page
+// set historical cities searched to page and display last city searched
 setCities();
+// funtion used to display current weather conditions onto page
 function displayCurrent() {
     // take user city
     var userCity = $('.input').val();
+    // save city to local storage
     saveInput();
     // query API based on user city
     var queryURL1 = "https://api.openweathermap.org/data/2.5/weather?units=imperial&q=" + userCity + "&appid=" + APIKey;
@@ -110,8 +112,9 @@ function display5day() {
     }
 });
 }
+clearButton();
 function saveInput(event) {
-    //event.preventDefault();
+    // grab user city
     var userCity = $('.input').val();
     // initialize variable to store array
     var cityArray;
@@ -121,22 +124,25 @@ function saveInput(event) {
     } else {
         cityArray = [];
     }
+    // if city already exists in array, halt function here
     for (let i=0; i < cityArray.length;i++) { 
         if (userCity === cityArray[i].city) {
             return;
         }
     }
-    //store time and value in an obj
+    //store city in an obj
     let newObj = {'city': userCity}
     //push obj to array
     cityArray.push(newObj)
     //set item
     localStorage.setItem('cities', JSON.stringify(cityArray));
-    //reload page
 }
 function setCities() {
+    // only set cities if one exists in local storage
     if (localStorage.getItem('cities')){
+        // grab array from local storage and set to variable
         const arr = JSON.parse(localStorage.getItem('cities'))
+        // prepend each city to history list on webpage
         for (let i=0; i < arr.length;i++) {
             var historybtn = $('<button>')
             historybtn.addClass(`list-group-item list-group-item-action`)
@@ -144,9 +150,26 @@ function setCities() {
             historybtn.text(arr[i].city)
             $list.prepend(historybtn)
         }
-        $('.input').val(arr[0].city)
+        // set input to last city searched
+        $('.input').val(arr[arr.length-1].city)
+        // display weather
         displayCurrent()
     }
+}
+// creates clear button and appends to page
+function clearButton() {
+    const $clearbtn = $('<button>');
+    $clearbtn.text('Clear Cities');
+    $clearbtn.addClass('btn btn-danger')
+    $clearbtn.css({
+        'border': '1px solid black',
+    });
+    $('.left').append($clearbtn);
+}
+// resets the page and clears local storage
+function clearCities() {
+    localStorage.removeItem('cities')
+    window.location.reload(true);
 }
 $(document).on("click", ".btn", function(event) {
     // dispay weather conditions when search button is clicked
@@ -167,3 +190,4 @@ $(document).on('click', '.list-group',function(event) {
     // display weather conditions
     displayCurrent();
 });
+$(document).on('click', '.btn-danger',clearCities);
