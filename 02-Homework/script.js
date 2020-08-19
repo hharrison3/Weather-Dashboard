@@ -14,9 +14,11 @@ var lat;
 var lon;
 const APIKey = "166a433c57516f51dfab1f7edaed8413";
 // funtion used to display current weather conditions onto page
+setCities();
 function displayCurrent() {
     // take user city
     var userCity = $('.input').val();
+    saveInput();
     // query API based on user city
     var queryURL1 = "https://api.openweathermap.org/data/2.5/weather?units=imperial&q=" + userCity + "&appid=" + APIKey;
     // make API request for icon, city name, temp, humidity, and wind
@@ -107,6 +109,44 @@ function display5day() {
         $fiveday.append($newdiv)
     }
 });
+}
+function saveInput(event) {
+    //event.preventDefault();
+    var userCity = $('.input').val();
+    // initialize variable to store array
+    var cityArray;
+    // set variable to array from local storage if one exists, else set to empty array
+    if (localStorage.getItem("cities")) {
+        cityArray = JSON.parse(localStorage.getItem("cities"));
+    } else {
+        cityArray = [];
+    }
+    for (let i=0; i < cityArray.length;i++) { 
+        if (userCity === cityArray[i].city) {
+            return;
+        }
+    }
+    //store time and value in an obj
+    let newObj = {'city': userCity}
+    //push obj to array
+    cityArray.push(newObj)
+    //set item
+    localStorage.setItem('cities', JSON.stringify(cityArray));
+    //reload page
+}
+function setCities() {
+    if (localStorage.getItem('cities')){
+        const arr = JSON.parse(localStorage.getItem('cities'))
+        for (let i=0; i < arr.length;i++) {
+            var historybtn = $('<button>')
+            historybtn.addClass(`list-group-item list-group-item-action`)
+            historybtn.attr('type', 'button')
+            historybtn.text(arr[i].city)
+            $list.prepend(historybtn)
+        }
+        $('.input').val(arr[0].city)
+        displayCurrent()
+    }
 }
 $(document).on("click", ".btn", function(event) {
     // dispay weather conditions when search button is clicked
